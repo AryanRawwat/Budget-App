@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: rails-ci-run
+spec:
+  pipelineRef:
+    name: rails-ci-pipeline
+  params:
+    - name: IMAGE
+      value: docker.io/aryanrawwat/budget-app:15june
+    - name: DOCKER_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: dockerhub-secret
+          key: username
+    - name: DOCKER_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: dockerhub-secret
+          key: password
+    - name: GIT_REPO
+      value: https://github.com/AryanRawwat/gitops_accessment.git
+    - name: FILE_PATH
+      value: app/rails-deployment.yaml
+    - name: IMAGE_TAG
+      value: 15june
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        metadata:
+          name: source-pvc
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 1Gi
+    - name: git-creds
+      secret:
+        secretName: git-credentials
+  serviceAccountName: pipeline-sa
+

@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: rails-ci-pipeline
+spec:
+  params:
+    - name: IMAGE
+    - name: DOCKER_USERNAME
+    - name: DOCKER_PASSWORD
+    - name: GIT_REPO
+    - name: FILE_PATH
+    - name: IMAGE_TAG
+  workspaces:
+    - name: source
+  tasks:
+    - name: build
+      taskRef:
+        name: build-docker-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: push
+      runAfter: [build]
+      taskRef:
+        name: push-docker-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: DOCKER_USERNAME
+          value: $(params.DOCKER_USERNAME)
+        - name: DOCKER_PASSWORD
+          value: $(params.DOCKER_PASSWORD)
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: update-tag
+      runAfter: [push]
+      taskRef:
+        name: update-image-tag
+      params:
+        - name: GIT_REPO
+          value: $(params.GIT_REPO)
+        - name: FILE_PATH
+          value: $(params.FILE_PATH)
+        - name: IMAGE_TAG
+          value: $(params.IMAGE_TAG)
+

@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-docker-image
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - name: build
+      image: docker:24.0.2-dind
+      securityContext:
+        privileged: true
+      script: |
+        #!/bin/sh
+        echo "[INFO] Switching to source directory..."
+        cd $(workspaces.source.path)
+
+        echo "[INFO] Listing files to verify source context:"
+        ls -la
+
+        echo "[INFO] Building Docker image: $(params.IMAGE)"
+        docker build -t $(params.IMAGE) .
+

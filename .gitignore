@@ -30,4 +30,13 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
+# Node.js dependencies
 node_modules/
+
+# Tekton CI/CD secret files (important!)
+tekton_cicd/dockerhub-secret.yaml
+tekton_cicd/git-credentials.yaml
+
+# Optional: Ignore CLI binaries or downloads
+tkn_*.tar.gz
+

@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: push-docker-image
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: IMAGE
+      type: string
+    - name: DOCKER_USERNAME
+      type: string
+    - name: DOCKER_PASSWORD
+      type: string
+  steps:
+    - name: push
+      image: docker:24.0.2-dind
+      securityContext:
+        privileged: true
+      script: |
+        #!/bin/sh
+        echo $(params.DOCKER_PASSWORD) | docker login -u $(params.DOCKER_USERNAME) --password-stdin
+        docker push $(params.IMAGE)
+

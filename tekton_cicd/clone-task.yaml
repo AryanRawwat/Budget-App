@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: clone-source-code
+spec:
+  params:
+    - name: REPO_URL
+      type: string
+      default: "https://github.com/AryanRawwat/Budget-App.git"
+    - name: REVISION
+      type: string
+      default: "main"
+  workspaces:
+    - name: output
+  steps:
+    - name: clone
+      image: alpine/git
+      script: |
+        #!/bin/sh
+        git clone -b $(params.REVISION) $(params.REPO_URL) $(workspaces.output.path)
+

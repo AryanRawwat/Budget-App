@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: update-image-tag
+spec:
+  params:
+    - name: GIT_REPO
+    - name: FILE_PATH
+    - name: IMAGE_TAG
+  workspaces:
+    - name: git-creds
+  steps:
+    - name: clone-and-update
+      image: alpine/git
+      workingDir: /workspace/git-creds
+      script: |
+        #!/bin/sh
+        git config --global user.name "Tekton Bot"
+        git config --global user.email "tekton@ci.local"
+
+        git clone $(params.GIT_REPO) repo
+        cd repo
+
+        sed -i "s|image: .*|image: docker.io/aryanrawwat/budget-app:$(params.IMAGE_TAG)|" $(params.FILE_PATH)
+
+        git commit -am "Update image tag to $(params.IMAGE_TAG)"
+        git push
+
