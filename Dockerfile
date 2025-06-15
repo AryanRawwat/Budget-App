@@ -28,6 +28,6 @@ COPY . .
 # Expose port (change if your app uses another port)
 EXPOSE 3000
 
-# Start the Rails server
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# ✅ Start the Rails server after cleaning up old PID
+CMD ["bash", "-c", "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"]
 
